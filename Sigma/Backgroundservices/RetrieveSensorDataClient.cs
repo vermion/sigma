@@ -139,7 +139,6 @@ namespace Sigma.Backgroundservices
             string[] splitData = converted.Split("\r\n");
             foreach (var splitItem in splitData)
             {
-                
                 var finalSplit = splitItem.Split(";");
 
                 try

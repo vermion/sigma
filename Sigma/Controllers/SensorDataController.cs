@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sigma.Backgroundservices;
+using Sigma.SensorDataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,21 +26,20 @@ namespace Sigma.Controllers
         }
 
         [HttpGet("{sensortype}")]
-        public ActionResult GetProduct(string sensortype) 
+        public ActionResult GetProduct(string sensortype, DateTime startDate) 
         {
-
-            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensortype && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == "2019-01-10").FirstOrDefault();
+            
+            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensortype && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == "2019-01-10").First();
             if (result == null)
                 return NotFound();
             else
-                return Ok(result.SensorData);
+            {
+                var temp = (Temperature)result;
 
-            //foreach (var item in _retrieveSensorDataClient._sensorData)
-            //{
-            //    if (item.GetType().Name.ToLower() == sensortype.ToLower() && item.MeasurementDay.Date.ToString("yyyy-MM-dd") == "2019-01-10")
-            //        _logger.LogInformation($"Is temperature on date: {item.MeasurementDay.ToString()}");
-            //}
-            //return Ok();
+                temp.ConvertCelsiusToFahrenheit();
+                return Ok(result.SensorData);
+            }
+               
         }
     }
 }
