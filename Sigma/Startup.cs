@@ -13,6 +13,8 @@ using Sigma.BackgroundServices;
 using Sigma.Models;
 using Serilog;
 using Sigma.Backgroundservices;
+using Sigma.ElasticSearch;
+
 
 namespace Sigma
 {
@@ -68,6 +70,8 @@ namespace Sigma
 
             services.AddSingleton<RetrieveSensorDataClient>();
             services.AddSingleton<IHostedService, ExecuteService>();
+
+            services.AddElasticsearch(_configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,5 +93,7 @@ namespace Sigma
 
             loggerFactory.AddSerilog();
         }
+
+        
     }
 }

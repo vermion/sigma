@@ -14,7 +14,6 @@ namespace Sigma.Controllers
     [Route("[controller]")]
     public class SensorDataController : ControllerBase
     {
-
         private readonly ILogger<SensorDataController> _logger;
         private readonly RetrieveSensorDataClient _retrieveSensorDataClient;
 
@@ -28,8 +27,7 @@ namespace Sigma.Controllers
         [HttpGet("{sensortype}")]
         public ActionResult GetProduct(string sensortype, DateTime startDate) 
         {
-            
-            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensortype && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == "2019-01-10").First();
+            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensortype && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd")).FirstOrDefault();
             if (result == null)
                 return NotFound();
             else
@@ -39,7 +37,6 @@ namespace Sigma.Controllers
                 temp.ConvertCelsiusToFahrenheit();
                 return Ok(result.SensorData);
             }
-               
         }
     }
 }
