@@ -32,6 +32,7 @@ namespace Sigma.Controllers
         [HttpGet("fordevice")]
         public async Task<ActionResult> GetProduct(string deviceId, string sensorType, DateTime startDate)
         {
+
             if (sensorType == null)
             {
                 var sensorData = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index(Indices.Index("devicedata"))
@@ -57,7 +58,7 @@ namespace Sigma.Controllers
                 )
             );
 
-            if (result != null)
+            if (result.Total != 0)
             {
                 return Ok(result.Documents);
             }
@@ -65,7 +66,6 @@ namespace Sigma.Controllers
             {
                 return NotFound();
             }
-
         }
     }
 }
