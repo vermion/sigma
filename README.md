@@ -12,3 +12,6 @@ https://sigma-exercise.azurewebsites.net/elasticsearch/fordevice/?deviceId=docka
 
 A better architecture would be to have a separate service parse data fron the csv-files and insert the data into ES every night.
 A second service would act as a API that reads from ES.
+
+Link to Kibana where to visualize the data that is stored in ES.
+https://2bbb9edde2bf4db3b8eac26acd9185bd.westeurope.azure.elastic-cloud.com:9243/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:'2019-01-09T23:00:00.000Z',to:'2019-01-18T11:00:00.000Z'))&_a=(columns:!(SensorType,DeviceID),index:ea107b90-0305-11ea-ab7c-254d8255474d,interval:auto,query:(language:kuery,query:''),sort:!(!(MeasurementDay,desc)))
