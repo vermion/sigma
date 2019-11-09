@@ -6,6 +6,7 @@ using Sigma.Models;
 using Sigma.SensorDataModels;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -126,9 +127,13 @@ namespace Sigma.Backgroundservices
 
             // More robust using regx?
 
-            var start = blob.Name.IndexOf(".csv") - 10;
-            var measurementDate = blob.Name.Substring(start, 10);
+            var startOfMeasurementDateIndex = blob.Name.IndexOf(".csv") - 10;
+            var measurementDate = blob.Name.Substring(startOfMeasurementDateIndex, 10);
 
+            var endOfDeviceIDIndex = blob.Name.IndexOf("/");
+            var deviceID = blob.Name.Substring(0, endOfDeviceIDIndex);
+
+            sensorMetaData.DeviceID = deviceID;
             sensorMetaData.MeasurementDay = DateTime.Parse(measurementDate);
             sensorMetaData.SensorData = new List<SensorData>();
 
@@ -144,7 +149,7 @@ namespace Sigma.Backgroundservices
                 try
                 {
                     measData.MeasurementTime.Add(DateTime.Parse(finalSplit[0]));
-                    measData.MeasurementData.Add(double.Parse(finalSplit[1]));
+                    measData.MeasurementData.Add(double.Parse(finalSplit[1], new NumberFormatInfo() { NumberDecimalSeparator = "," } ));
                 }
                 catch (Exception ex)
                 {

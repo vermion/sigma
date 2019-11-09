@@ -16,6 +16,7 @@ namespace Sigma.ElasticSearch
             var defaultIndex = configuration["elasticsearch:index"];
 
             var settings = new ConnectionSettings(new Uri(url))
+                .BasicAuthentication("elastic", "TlCa64kT3EcXu2z1h6guW0pW")
                 .DefaultIndex(defaultIndex)
                 .DefaultMappingFor<SensorDataModels.SensorMetaData>(m => m
                     .PropertyName(p => p.SensorData, "SensorData")

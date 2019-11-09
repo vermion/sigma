@@ -24,17 +24,21 @@ namespace Sigma.Controllers
             _retrieveSensorDataClient = retrieveSensorDataClient;
         }
 
-        [HttpGet("{sensortype}")]
-        public ActionResult GetProduct(string sensortype, DateTime startDate) 
+        [HttpGet("{deviceId}/{sensorType}/{startDate}")]
+        public ActionResult GetProduct(string deviceId, string sensorType, DateTime startDate) 
         {
-            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensortype && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd")).FirstOrDefault();
+            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensorType && x.DeviceID== deviceId && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd")).FirstOrDefault();
             if (result == null)
                 return NotFound();
-            else
+            else if (sensorType == "temperature")
             {
                 var temp = (Temperature)result;
 
                 temp.ConvertCelsiusToFahrenheit();
+                return Ok(result.SensorData);
+            }
+            else
+            {
                 return Ok(result.SensorData);
             }
         }

@@ -14,7 +14,9 @@ using Sigma.Models;
 using Serilog;
 using Sigma.Backgroundservices;
 using Sigma.ElasticSearch;
-
+using Serilog.Events;
+using Serilog.Core;
+using Serilog.Sinks.Elasticsearch;
 
 namespace Sigma
 {
@@ -32,19 +34,19 @@ namespace Sigma
             {
                 builder = new ConfigurationBuilder()
                    .SetBasePath(hostingEnvironment.ContentRootPath)
-                   .AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
+                   .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
             }
             else if (hostingEnvironment.IsProduction())
             {
                 builder = new ConfigurationBuilder()
                     .SetBasePath(hostingEnvironment.ContentRootPath)
-                    .AddJsonFile("appsettings.production.json", optional: true, reloadOnChange: true);
+                    .AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true);
             }
             else if (hostingEnvironment.IsStaging())
             {
                 builder = new ConfigurationBuilder()
                     .SetBasePath(hostingEnvironment.ContentRootPath)
-                    .AddJsonFile("appsettings.staging.json", optional: true, reloadOnChange: true);
+                    .AddJsonFile("appsettings.Staging.json", optional: true, reloadOnChange: true);
             }
             else if (hostingEnvironment.EnvironmentName == "Test")
             {
@@ -55,10 +57,41 @@ namespace Sigma
             else
                 throw new Exception("NO ENVIRONMENT SET!");
 
+            var settings = configuration.GetSection("Logging").GetSection("LogLevel").GetValue("Default", "Information");
+
+            var levelSwitch = new LoggingLevelSwitch();
+            switch (settings)
+            {
+                case "Debug":
+                    levelSwitch.MinimumLevel = LogEventLevel.Debug;
+                    break;
+                case "Information":
+                    levelSwitch.MinimumLevel = LogEventLevel.Information;
+                    break;
+                case "Warning":
+                    levelSwitch.MinimumLevel = LogEventLevel.Warning;
+                    break;
+                case "Error":
+                    levelSwitch.MinimumLevel = LogEventLevel.Error;
+                    break;
+                default:
+                    levelSwitch.MinimumLevel = LogEventLevel.Information;
+                    break;
+            
+            }
+
+            var elasticUri = configuration["elasticsearch:uri"];
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.ControlledBy(levelSwitch)
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .CreateLogger();
+                .Enrich.WithProperty("Application", "SIGMA")
+                .Enrich.WithProperty("Environment", hostingEnvironment.EnvironmentName)
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
+                {
+                    AutoRegisterTemplate = true,
+
+                })
+            .CreateLogger();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -93,7 +126,5 @@ namespace Sigma
 
             loggerFactory.AddSerilog();
         }
-
-        
     }
 }
