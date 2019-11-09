@@ -10,12 +10,12 @@ namespace Sigma.ElasticSearch
     public class ElasticSearchExecuteService : ElasticSearchHostedService
     {
         private readonly IOptions<GeneralSettings> _generalSettings;
-        private readonly RetrieveSensorDataClient _retrieveSensorDataClient;
+        private readonly ElasticSearchDataClient _elasticSearchDataClient;
 
-        public ElasticSearchExecuteService(RetrieveSensorDataClient retrieveSensorDataClient, 
-                              IOptions<GeneralSettings> generalSettings)
+        public ElasticSearchExecuteService(IOptions<GeneralSettings> generalSettings,
+                                           ElasticSearchDataClient elasticSearchDataClient)
         {
-            _retrieveSensorDataClient = retrieveSensorDataClient;
+            _elasticSearchDataClient = elasticSearchDataClient;
             _generalSettings = generalSettings;
         }
 
@@ -24,8 +24,8 @@ namespace Sigma.ElasticSearch
             while (!cancellationToken.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(20), cancellationToken);
-                await _retrieveSensorDataClient.UpdateAsync();
-                await Task.Delay(TimeSpan.FromMinutes(_generalSettings.Value.BackgrousServiceUpdateIntervalInMinutes), cancellationToken);
+                await _elasticSearchDataClient.UpdateAsync();
+                await Task.Delay(TimeSpan.FromHours(_generalSettings.Value.BackgrousServiceUpdateIntervalInMinutes), cancellationToken);
             }
         }
     }

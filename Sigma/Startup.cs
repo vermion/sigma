@@ -105,7 +105,7 @@ namespace Sigma
             services.AddSingleton<IHostedService, ExecuteService>();
 
             services.AddSingleton<ElasticSearchDataClient>();
-            services.AddSingleton<IHostedService, ElasticSearchHostedService>();
+            services.AddSingleton<IHostedService, ElasticSearchExecuteService>();
 
             services.AddElasticsearch(_configuration);
         }

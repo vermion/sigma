@@ -18,10 +18,11 @@ namespace Sigma.ElasticSearch
             var settings = new ConnectionSettings(new Uri(url))
                 .BasicAuthentication("elastic", "TlCa64kT3EcXu2z1h6guW0pW")
                 .DefaultIndex(defaultIndex)
-                .DefaultMappingFor<SensorDataModels.SensorMetaData>(m => m
+                .DefaultMappingFor<ElasticSearchIndexModel>(m => m
                     .PropertyName(p => p.SensorData, "SensorData")
                     .PropertyName(p => p.MeasurementDay, "MeasurementDay")
                     .PropertyName(p => p.DeviceID, "DeviceID")
+                    .PropertyName(p => p.SensorType, "SensorType")
                 );
 
             var client = new ElasticClient(settings);

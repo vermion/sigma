@@ -112,8 +112,8 @@ namespace Sigma.Backgroundservices
         }
 
         /// <summary>
-        /// Parses incoming data according to {DateTime}, {double}.
-        /// Adds data to global list: SensorData.
+        /// Parses incoming data according to {DateTime}, {double} from .csv-files.
+        /// Adds data to global list: _metaSensorData.
         /// </summary>
         /// <param name="mStream"></param>
         /// <param name="sensorMetaData"></param>
@@ -153,7 +153,7 @@ namespace Sigma.Backgroundservices
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogCritical(ex.Message);
+                    _logger.LogWarning(ex.Message);
                 }
             }
 
