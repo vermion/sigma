@@ -24,9 +24,18 @@ namespace Sigma.Controllers
             _retrieveSensorDataClient = retrieveSensorDataClient;
         }
 
-        [HttpGet("{deviceId}/{sensorType}/{startDate}")]
+        [HttpGet("fordevice")]
         public ActionResult GetProduct(string deviceId, string sensorType, DateTime startDate) 
         {
+            if (sensorType == null)
+            {
+                var sensorData = _retrieveSensorDataClient._metaSensorData.Where(x => x.DeviceID == deviceId && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd"));
+                if (sensorData != null)
+                    return Ok(sensorData);
+                else
+                    return NotFound();
+            }
+
             var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensorType && x.DeviceID== deviceId && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd")).FirstOrDefault();
             if (result == null)
                 return NotFound();

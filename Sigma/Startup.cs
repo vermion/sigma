@@ -104,6 +104,9 @@ namespace Sigma
             services.AddSingleton<RetrieveSensorDataClient>();
             services.AddSingleton<IHostedService, ExecuteService>();
 
+            services.AddSingleton<ElasticSearchDataClient>();
+            services.AddSingleton<IHostedService, ElasticSearchHostedService>();
+
             services.AddElasticsearch(_configuration);
         }
 

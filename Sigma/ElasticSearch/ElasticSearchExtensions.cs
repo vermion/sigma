@@ -21,6 +21,7 @@ namespace Sigma.ElasticSearch
                 .DefaultMappingFor<SensorDataModels.SensorMetaData>(m => m
                     .PropertyName(p => p.SensorData, "SensorData")
                     .PropertyName(p => p.MeasurementDay, "MeasurementDay")
+                    .PropertyName(p => p.DeviceID, "DeviceID")
                 );
 
             var client = new ElasticClient(settings);
