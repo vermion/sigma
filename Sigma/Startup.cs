@@ -18,6 +18,9 @@ using Serilog.Events;
 using Serilog.Core;
 using Serilog.Sinks.Elasticsearch;
 using MediatR;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.CodeAnalysis.Options;
+using Swashbuckle.Swagger;
 
 namespace Sigma
 {
@@ -111,6 +114,12 @@ namespace Sigma
             services.AddElasticsearch(_configuration);
 
             services.AddMediatR(typeof(Startup));
+
+            services.AddSwaggerGen(x => 
+            {
+                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Sensoe data API", Version = "v1" });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -120,6 +129,15 @@ namespace Sigma
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            var swaggerOptions = new Swagger.SwaggerOptions();
+            _configuration.GetSection(nameof(Swagger.SwaggerOptions)).Bind(swaggerOptions);
+
+            app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; });
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint(swaggerOptions.UIEndpoint, swaggerOptions.Description);    
+            });
 
             app.UseRouting();
 
