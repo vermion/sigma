@@ -7,7 +7,7 @@ Build an API to fetch the data based on sensor type and date.
 There are three sensor types with time stamps.
 
 Solution is built around a ASP .Net Core 3.0 API project.
-A background service fetches data from the blob and stores the data in memory. Each sensor is represented by its own class that inherits from an abstract base class.
+A background service fetches data from the blob and stores the data in-memory. Each sensor is represented by its own class that inherits from an abstract base class.
 By using polymorphism it is possible to add new sensor types to the project and encapsulating functionality such as for example converting and returning temperature as fahrenheit.
 https://sigma-exercise.azurewebsites.net/sensordata/fordevice/?deviceId=dockan&sensorType=temperature&startDate=2019-01-10
 This endpoint will automatically convert temperature data to fahrenheit. This is just to demonstrate the idea of polymorphism.
@@ -25,3 +25,14 @@ Make the controller thinner by implementing CQRS with mediator for encapsulating
 A better architecture would be to have a separate service parse data fron the csv-files in the blob storage and 
 insert the data into ES every night.
 A second service would act as a API that reads from ES. Unit tests.
+
+For testing Locally
+Run "docker-compose up" to start ElasticSearch/Kibana.
+Kibana:
+http://localhost:5601/
+
+To access the in-memory sensor data API:
+http://localhost:5000/api/v1/sensordata/fordevice/?deviceId=dockan&sensorType=temperature&startDate=2019-01-10
+
+Swagger endpoint:
+http://localhost:5000/swagger/index.html
