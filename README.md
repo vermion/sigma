@@ -21,7 +21,7 @@ https://2bbb9edde2bf4db3b8eac26acd9185bd.westeurope.azure.elastic-cloud.com:9243
 
 Other improvements to the project:
 Swagger for documenting the API's directly from the endpoint.
-Mske the controller thinner by implementing CQRS with mediator for encapsulating the business logic. 
+Make the controller thinner by implementing CQRS with mediator for encapsulating the business logic. 
 A better architecture would be to have a separate service parse data fron the csv-files in the blob storage and 
 insert the data into ES every night.
 A second service would act as a API that reads from ES.
