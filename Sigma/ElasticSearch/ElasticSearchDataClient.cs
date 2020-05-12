@@ -57,7 +57,7 @@ namespace Sigma.ElasticSearch
                         .Explain()
                     );
 
-                if (response == null)
+                if (response.Documents.Count == 0)
                 {
                     var esim = new ElasticSearchIndexModel();
                     esim.DeviceID = item.DeviceID;
