@@ -17,6 +17,7 @@ using Sigma.ElasticSearch;
 using Serilog.Events;
 using Serilog.Core;
 using Serilog.Sinks.Elasticsearch;
+using MediatR;
 
 namespace Sigma
 {
@@ -108,6 +109,8 @@ namespace Sigma
             services.AddSingleton<IHostedService, ElasticSearchExecuteService>();
 
             services.AddElasticsearch(_configuration);
+
+            services.AddMediatR(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

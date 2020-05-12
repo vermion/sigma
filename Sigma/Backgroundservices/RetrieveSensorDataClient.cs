@@ -32,7 +32,15 @@ namespace Sigma.Backgroundservices
         { 
             _logger.LogInformation($"Background service to fetch sensor data triggered at: {DateTime.Now}");
 
-            await ParseConnectionStringAndConnectoToBlob();
+            try
+            {
+                await ParseConnectionStringAndConnectoToBlob();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+            }
+            
         }
 
         private async Task ParseConnectionStringAndConnectoToBlob()

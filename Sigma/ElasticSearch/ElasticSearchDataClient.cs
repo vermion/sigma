@@ -1,18 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Sigma.Models;
-using Sigma.SensorDataModels;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Nest;
 using Sigma.Backgroundservices;
+using Sigma.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace Sigma.ElasticSearch
 {
@@ -23,7 +15,7 @@ namespace Sigma.ElasticSearch
         private readonly RetrieveSensorDataClient _retrieveSensorDataClient;
         private readonly IElasticClient _elasticClient;
 
-        public ElasticSearchDataClient(IOptions<GeneralSettings> generalSettings, 
+        public ElasticSearchDataClient(IOptions<GeneralSettings> generalSettings,
                                         ILogger<ElasticSearchDataClient> logger,
                                         RetrieveSensorDataClient retrieveSensorDataClient,
                                         IElasticClient elasticClient)
@@ -35,10 +27,17 @@ namespace Sigma.ElasticSearch
         }
 
         public async Task UpdateAsync()
-        { 
+        {
             _logger.LogInformation($"Background service to index ElasticSearch triggered at: {DateTime.Now}");
 
-            await CheckForNewData();
+            try
+            {
+                await CheckForNewData();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+            }
         }
 
         /// <summary>
@@ -50,29 +49,23 @@ namespace Sigma.ElasticSearch
 
             foreach (var item in _retrieveSensorDataClient._metaSensorData)
             {
-                try
-                {
-                    var response = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index(Indices.Index("devicedata"))
+
+                var response = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index(Indices.Index("devicedata"))
                         .Query(query => query
                         .Term(f => f.MeasurementDay, item.MeasurementDay))
                         .Size(1)
                         .Explain()
                     );
 
-                    if (response == null)
-                    {
-                        var esim = new ElasticSearchIndexModel();
-                        esim.DeviceID = item.DeviceID;
-                        esim.SensorData = item.SensorData;
-                        esim.SensorType = item.GetType().Name;
-                        esim.MeasurementDay = item.MeasurementDay;
-                        await _elasticClient.IndexDocumentAsync(esim);
-                        _logger.LogInformation($"Adding new measurement: {item.MeasurementDay} for {item.GetType().Name}");
-                    }
-                }
-                catch (Exception ex)
+                if (response == null)
                 {
-                    _logger.LogCritical(ex.Message);
+                    var esim = new ElasticSearchIndexModel();
+                    esim.DeviceID = item.DeviceID;
+                    esim.SensorData = item.SensorData;
+                    esim.SensorType = item.GetType().Name;
+                    esim.MeasurementDay = item.MeasurementDay;
+                    await _elasticClient.IndexDocumentAsync(esim);
+                    _logger.LogInformation($"Adding new measurement: {item.MeasurementDay} for {item.GetType().Name}");
                 }
             }
         }

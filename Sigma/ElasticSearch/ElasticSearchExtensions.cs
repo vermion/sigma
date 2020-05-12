@@ -15,8 +15,9 @@ namespace Sigma.ElasticSearch
             var url = configuration["elasticsearch:url"];
             var defaultIndex = configuration["elasticsearch:index"];
 
+
+
             var settings = new ConnectionSettings(new Uri(url))
-                .BasicAuthentication("elastic", "TlCa64kT3EcXu2z1h6guW0pW")
                 .DefaultIndex(defaultIndex)
                 .DefaultMappingFor<ElasticSearchIndexModel>(m => m
                     .PropertyName(p => p.SensorData, "SensorData")
@@ -26,6 +27,11 @@ namespace Sigma.ElasticSearch
                 );
 
             var client = new ElasticClient(settings);
+
+            var result = client.Indices.Exists(defaultIndex);
+
+            if (!result.Exists)
+                client.Indices.Create(defaultIndex);
 
             services.AddSingleton<IElasticClient>(client);
         }

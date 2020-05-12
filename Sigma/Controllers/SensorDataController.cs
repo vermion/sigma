@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Nest;
 using Sigma.Backgroundservices;
+using Sigma.Queries;
 using Sigma.SensorDataModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Sigma.Controllers
 {
@@ -16,40 +18,32 @@ namespace Sigma.Controllers
     {
         private readonly ILogger<SensorDataController> _logger;
         private readonly RetrieveSensorDataClient _retrieveSensorDataClient;
+        private readonly IMediator _mediator;
 
         public SensorDataController(ILogger<SensorDataController> logger,
-                                    RetrieveSensorDataClient retrieveSensorDataClient)
+                                    RetrieveSensorDataClient retrieveSensorDataClient,
+                                    IMediator mediator)
         {
             _logger = logger;
             _retrieveSensorDataClient = retrieveSensorDataClient;
+            _mediator = mediator;
         }
 
         [HttpGet("fordevice")]
         public ActionResult GetProduct(string deviceId, string sensorType, DateTime startDate) 
         {
-            if (sensorType == null)
-            {
-                var sensorData = _retrieveSensorDataClient._metaSensorData.Where(x => x.DeviceID == deviceId && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd"));
-                if (sensorData != null)
-                    return Ok(sensorData);
-                else
-                    return NotFound();
-            }
+            var query = new GetInMemorySensorDataQuery {
+                DeviceId = deviceId,
+                SensorType = sensorType,
+                StartDate = startDate
+            };
 
-            var result = _retrieveSensorDataClient._metaSensorData.Where(x => x.GetType().Name.ToLower() == sensorType && x.DeviceID== deviceId && x.MeasurementDay.Date.ToString("yyyy-MM-dd") == startDate.Date.ToString("yyyy-MM-dd")).FirstOrDefault();
-            if (result == null)
-                return NotFound();
-            else if (sensorType == "temperature")
-            {
-                var temp = (Temperature)result;
+            var response = _mediator.Send(query);
 
-                temp.ConvertCelsiusToFahrenheit();
-                return Ok(result.SensorData);
-            }
+            if (response != null)
+                return Ok(response);
             else
-            {
-                return Ok(result.SensorData);
-            }
+                return NotFound();
         }
     }
 }
