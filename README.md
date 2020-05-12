@@ -24,4 +24,4 @@ Swagger for documenting the API's directly from the endpoint.
 Make the controller thinner by implementing CQRS with mediator for encapsulating the business logic. 
 A better architecture would be to have a separate service parse data fron the csv-files in the blob storage and 
 insert the data into ES every night.
-A second service would act as a API that reads from ES.
+A second service would act as a API that reads from ES. Unit tests.
