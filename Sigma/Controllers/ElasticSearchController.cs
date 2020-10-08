@@ -13,7 +13,7 @@ using Sigma.ElasticSearch;
 namespace Sigma.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class ElasticSearchController : ControllerBase
     {
         private readonly ILogger<ElasticSearchController> _logger;
@@ -36,12 +36,13 @@ namespace Sigma.Controllers
             if (sensorType == null)
             {
                 var sensorData = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index(Indices.Index("devicedata"))
-                    .Query(query => query
-                    .Term(md => md.MeasurementDay, startDate))
+                    .From(0)
+                    .Size(2000)
+                    .MatchAll()
                     .Explain()
                 );
 
-                if (sensorData != null)
+                if (sensorData.Total != 0)
                     return Ok(sensorData.Documents);
                 else
                     return NotFound();
@@ -52,7 +53,8 @@ namespace Sigma.Controllers
                 .Bool(bq => bq
                     .Filter(
                         fq => fq.Terms(t => t.Field(f => f.MeasurementDay).Terms(startDate)),
-                        fq => fq.Terms(t => t.Field(f => f.SensorType).Terms(sensorType))
+                        fq => fq.Terms(t => t.Field(f => f.SensorType).Terms(sensorType)),
+                        fq => fq.Terms(t => t.Field(f => f.DeviceID).Terms(deviceId))
                         )
                     )
                 )

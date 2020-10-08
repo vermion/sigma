@@ -10,10 +10,11 @@ On startup the latest data is fetched and then stored in Elasticsearch.
 Technologies used:
 Swagger for documenting the API's directly from the endpoint.
 CQRS for lean controller.
+Elasticsearch is used for logging events.
 
 Improvements:
 A better architecture would be to have a separate service parse data fron the csv-files in the blob storage and 
-insert the data into ES every night.
+insert the data into ES every night. This is a work in progress almost done.
 A second service would act as a API that reads from ES. 
 Unit tests.
 
@@ -21,9 +22,6 @@ For testing Locally
 Run "docker-compose up" to start ElasticSearch/Kibana.
 
 To access the in-memory sensor data API:
-http://localhost:5000/api/v1/sensordata/fordevice/?deviceId=dockan&sensorType=temperature&startDate=2019-01-10
-
-To access the Elasticsearch sensor data API:
 http://localhost:5000/api/v1/sensordata/fordevice/?deviceId=dockan&sensorType=temperature&startDate=2019-01-10
 
 Kibana:
