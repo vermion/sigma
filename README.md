@@ -23,6 +23,7 @@ Run "docker-compose up" to start ElasticSearch/Kibana.
 
 To access the in-memory sensor data API:
 http://localhost:5000/api/v1/sensordata/fordevice/?deviceId=dockan&sensorType=temperature&startDate=2019-01-10
+(This API is working and tested)
 
 Kibana:
 http://localhost:5601/

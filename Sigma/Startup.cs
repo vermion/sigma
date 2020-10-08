@@ -59,31 +59,21 @@ namespace Sigma
                     .AddJsonFile("appsettings.Test.json", optional: true, reloadOnChange: true);
             }
             else
+            {
                 throw new Exception("NO ENVIRONMENT SET!");
+            }
 
             var settings = configuration.GetSection("Logging").GetSection("LogLevel").GetValue("Default", "Information");
 
             var levelSwitch = new LoggingLevelSwitch();
-            switch (settings)
+            levelSwitch.MinimumLevel = settings switch
             {
-                case "Debug":
-                    levelSwitch.MinimumLevel = LogEventLevel.Debug;
-                    break;
-                case "Information":
-                    levelSwitch.MinimumLevel = LogEventLevel.Information;
-                    break;
-                case "Warning":
-                    levelSwitch.MinimumLevel = LogEventLevel.Warning;
-                    break;
-                case "Error":
-                    levelSwitch.MinimumLevel = LogEventLevel.Error;
-                    break;
-                default:
-                    levelSwitch.MinimumLevel = LogEventLevel.Information;
-                    break;
-            
-            }
-
+                "Debug" => LogEventLevel.Debug,
+                "Information" => LogEventLevel.Information,
+                "Warning" => LogEventLevel.Warning,
+                "Error" => LogEventLevel.Error,
+                _ => LogEventLevel.Information,
+            };
             var elasticUri = configuration["elasticsearch:uri"];
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
@@ -117,7 +107,7 @@ namespace Sigma
 
             services.AddSwaggerGen(x => 
             {
-                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Sensoe data API", Version = "v1" });
+                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Sensor data API", Version = "v1" });
             });
 
         }

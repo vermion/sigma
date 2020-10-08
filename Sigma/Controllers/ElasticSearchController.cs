@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nest;
 using Sigma.Backgroundservices;
 using Sigma.ElasticSearch;
+using System;
+using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Sigma.Controllers
 {
+    /// <summary>
+    /// This API is still a work in progress.
+    /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ElasticSearchController : ControllerBase
@@ -20,8 +21,8 @@ namespace Sigma.Controllers
         private readonly IElasticClient _elasticClient;
         private readonly RetrieveSensorDataClient _retrieveSensorDataClient;
 
-        public ElasticSearchController(ILogger<ElasticSearchController> logger, 
-                                       IElasticClient elasticClient, 
+        public ElasticSearchController(ILogger<ElasticSearchController> logger,
+                                       IElasticClient elasticClient,
                                        RetrieveSensorDataClient retrieveSensorDataClient)
         {
             _logger = logger;
@@ -32,42 +33,18 @@ namespace Sigma.Controllers
         [HttpGet("fordevice")]
         public async Task<ActionResult> GetProduct(string deviceId, string sensorType, DateTime startDate)
         {
-
-            if (sensorType == null)
-            {
-                var sensorData = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index(Indices.Index("devicedata"))
-                    .From(0)
-                    .Size(2000)
-                    .MatchAll()
-                    .Explain()
-                );
-
-                if (sensorData.Total != 0)
-                    return Ok(sensorData.Documents);
-                else
-                    return NotFound();
-            }
-
-            var result = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index("devicedata")
-            .Query(q => q
-                .Bool(bq => bq
-                    .Filter(
-                        fq => fq.Terms(t => t.Field(f => f.MeasurementDay).Terms(startDate)),
-                        fq => fq.Terms(t => t.Field(f => f.SensorType).Terms(sensorType)),
-                        fq => fq.Terms(t => t.Field(f => f.DeviceID).Terms(deviceId))
-                        )
-                    )
-                )
+            var sensorData = await _elasticClient.SearchAsync<ElasticSearchIndexModel>(s => s.Index(Indices.Index("devicedata"))
+                .From(0)
+                .Size(2000)
+                .MatchAll()
+                .Explain()
             );
 
-            if (result.Total != 0)
-            {
-                return Ok(result.Documents);
-            }
+            if (sensorData.Total != 0)
+                return Ok(sensorData.Documents);
             else
-            {
                 return NotFound();
-            }
+            
         }
     }
 }
